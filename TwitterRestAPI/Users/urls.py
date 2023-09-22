@@ -7,6 +7,7 @@ urlpatterns = [
     path("signup/", SignupView.as_view()),
     path("login/", LoginView.as_view()),
     path("<str:user>/follow", FollowUserView.as_view()),
+    
 ]
 
 
