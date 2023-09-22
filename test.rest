@@ -1,0 +1,40 @@
+###
+
+POST http://127.0.0.1:8000/login/
+Content-Type: application/json
+
+{"username": "sena5", "password":"Pass1234!"}
+
+###
+
+POST http://127.0.0.1:8000/signup
+Content-Type: application/json
+
+{"username": "abdullah", "password":"Pass1234!"}
+
+###
+POST http://127.0.0.1:8000/sena4/follow
+Content-Type: application/json
+
+
+###
+POST http://127.0.0.1:8000/tweet/create
+Content-Type: application/json
+
+{"tweet":"first try to tweet2"}
+
+###
+
+GET http://127.0.0.1:8000/tweet/profile_timeline
+Content-Type: application/json
+
+
+###
+
+POST http://127.0.0.1:8000/tweet/retweet
+Content-Type: application/json
+
+{"tweet_user":"sena4","tweet_text":"retweet yaptık"}
+
+###
+
