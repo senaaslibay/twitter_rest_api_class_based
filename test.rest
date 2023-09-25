@@ -18,14 +18,14 @@ Content-Type: application/json
 
 
 ###
-POST http://127.0.0.1:8000/tweet/create
+POST http://127.0.0.1:8000/tweet/tweet/
 Content-Type: application/json
 
-{"tweet":"first try to tweet2"}
+{"tweet":"oldu mu deniyorz"}
 
 ###
 
-GET http://127.0.0.1:8000/tweet/profile_timeline
+GET http://127.0.0.1:8000/tweet/tweet
 Content-Type: application/json
 
 
@@ -35,6 +35,12 @@ POST http://127.0.0.1:8000/tweet/retweet
 Content-Type: application/json
 
 {"tweet_user":"sena4","tweet_text":"retweet yaptık"}
+
+###
+
+GET http://127.0.0.1:8000/tweet/tweet/my_profile_timeline_list
+Content-Type: application/json
+
 
 ###
 
