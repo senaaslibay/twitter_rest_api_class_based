@@ -1,20 +1,11 @@
-from datetime import datetime
-from django.http import HttpResponse
 from rest_framework import status
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import  action
 from rest_framework.response import Response
-from django.core.paginator import Paginator
-import json
 import logging
 from Users.models import Users
 from Users.views import Auth
 from Tweets.models import Tweets
 from Tweets.serializer import TweetsSerializer, CreateTweetsSerializer
-from Users.serializer import UserSerializer
-from django.db.models import Q
-
-from rest_framework.views import APIView
-from django.shortcuts import render
 
 from rest_framework import viewsets, permissions
 
@@ -43,7 +34,7 @@ class TweetView(viewsets.ModelViewSet):
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            
     def list(self, request):
         try:
             userdata = Auth(request=request)
@@ -66,6 +57,31 @@ class TweetView(viewsets.ModelViewSet):
 
         except Exception as e:
             return Response(e, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(detail=True, methods=["get"],url_path=f"user_profile_timeline_list",)
+    def user_profile_timeline_list(self,request,pk=None):
+        try:
+            userid = Auth(request=request)["id"]
+            if (checkUserAllowness(pk,userid)["allowness"]):
+                query_set = Tweets.objects.filter(retweets__id=pk) | Tweets.objects.filter(username=pk)
+                return Response(self.get_serializer_class()(query_set, many=True).data,status=status.HTTP_200_OK) 
+            return Response("You dont have permission to see that.",status=status.HTTP_423_LOCKED) 
+            
+        except Exception as e:
+            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+
+def checkUserAllowness(targetuserid,userid):
+    locked= Users.objects.get(id=targetuserid).locked
+    print("lsajklajkdsjdflksjdlfkjdlfkjlfj",locked)
+    if locked:
+        userid_list = Users.objects.get(id=targetuserid).following.values_list("id", flat=True)
+        if userid in userid_list:
+            return {"locked":True, "allowness":True}
+        return {"locked":True, "allowness":False}
+    return {"locked":False, "allowness":True}         
+
+
 
     
 

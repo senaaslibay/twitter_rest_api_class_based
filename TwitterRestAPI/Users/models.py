@@ -8,6 +8,8 @@ class Users(models.Model):
     password= models.CharField(max_length=100)
     following = models.ManyToManyField('self',related_name="following_users",symmetrical=False,blank=True)
     followers = models.ManyToManyField('self', related_name="followers_users",symmetrical=False,blank=True)
-    token = models.CharField(max_length=10000, null=True)
+    locked = models.BooleanField(default=False)
+    follow_requests = models.ManyToManyField('self',related_name="follow_request",symmetrical=False,blank=True)
+    token= models.CharField(max_length=10000, null=True)
 
         

@@ -16,6 +16,8 @@ from rest_framework.views import APIView
 from django.shortcuts import render
 
 
+
+
 EXP_TIME = datetime.timedelta(hours=1)
 
 class SignupView(APIView):
@@ -51,9 +53,19 @@ class LoginView(APIView):
 
 class FollowUserView(APIView):
     def post(self,request, user):
-        loggedin_user = Auth(request=request)["username"]
-        cur_user = Users.objects.get(username=loggedin_user)
+        loggedin_username = Auth(request=request)["username"]
+
+        cur_user = Users.objects.get(username=loggedin_username)
         fol_user = Users.objects.get(username=user)
+
+        if (checkUserAllowness(targetuserid=fol_user.id,userid=cur_user.id)["locked"]):
+            fol_user.follow_requests.add(cur_user)
+            return Response("Your request has been sended.",status=status.HTTP_200_OK)
+        
+        follower_id_list = Users.objects.get(username=user).followers.values_list("id", flat=True)
+
+        if (cur_user.id in follower_id_list):
+            return Response("You are already following this user.",status=status.HTTP_200_OK) 
         cur_user.following.add(fol_user)
         cur_user.save()
         cur_serializer = UserSerializer(cur_user)
@@ -79,3 +91,4 @@ def Auth(request):
         return serializer.data
     except:
         return Response(status=status.HTTP_403_FORBIDDEN)
+from Tweets.views import checkUserAllowness

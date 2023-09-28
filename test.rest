@@ -44,3 +44,11 @@ Content-Type: application/json
 
 ###
 
+GET http://127.0.0.1:8000/tweet/tweet/6/user_profile_timeline_list
+Content-Type: application/json
+
+
+###
+
+
+
