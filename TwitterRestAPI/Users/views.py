@@ -64,8 +64,8 @@ class FollowUserView(APIView):
         
         follower_id_list = Users.objects.get(username=user).followers.values_list("id", flat=True)
 
-        if (cur_user.id in follower_id_list):
-            return Response("You are already following this user.",status=status.HTTP_200_OK) 
+        # if (cur_user.id in follower_id_list):
+        #     return Response("You are already following this user.",status=status.HTTP_200_OK) buna gerek yok gibi zaten set tutuyo 
         cur_user.following.add(fol_user)
         cur_user.save()
         cur_serializer = UserSerializer(cur_user)

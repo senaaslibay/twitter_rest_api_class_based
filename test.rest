@@ -3,7 +3,7 @@
 POST http://127.0.0.1:8000/login/
 Content-Type: application/json
 
-{"username": "sena5", "password":"Pass1234!"}
+{"username": "sena6", "password":"Pass1234!"}
 
 ###
 
@@ -31,7 +31,7 @@ Content-Type: application/json
 
 ###
 
-POST http://127.0.0.1:8000/tweet/retweet
+POST http://127.0.0.1:8000/tweet/tweet/retweet/
 Content-Type: application/json
 
 {"tweet_user":"sena4","tweet_text":"retweet yaptık"}

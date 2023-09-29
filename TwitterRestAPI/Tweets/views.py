@@ -66,65 +66,70 @@ class TweetView(viewsets.ModelViewSet):
             if (checkUserAllowness(pk,userid)["allowness"]):
                 query_set = Tweets.objects.filter(retweets__id=pk) | Tweets.objects.filter(username=pk)
                 return Response(self.get_serializer_class()(query_set, many=True).data,status=status.HTTP_200_OK) 
-            return Response("You dont have permission to see that.",status=status.HTTP_423_LOCKED) 
+            return Response("You dont have permission to see this.",status=status.HTTP_423_LOCKED) 
             
         except Exception as e:
             return Response(e, status=status.HTTP_400_BAD_REQUEST)
 
+    
+    
+    @action(detail=False, methods=["post"],url_path=f"retweet",)
+    def retweet(self, request):
+        try:
+            username = Auth(request=request)["username"]
+            user = Users.objects.get(username=username)
+
+            tweet_username = request.data["tweet_user"]
+            tweet_text = request.data["tweet_text"]
+
+            tweet_user = Users.objects.get(username=tweet_username)
+            retweeted = Tweets.objects.get(username=tweet_user, tweet=tweet_text)
+
+            if (checkUserAllowness(tweet_user.id,user.id)["allowness"]):
+                # if user.id in retweeted.values_list("id", flat=True):
+                #     return Response("You already retweeted this tweet.",status=status.HTTP_200_OK) buna gerek yok gibi çünkü set olarak saklıyo.
+                retweeted.retweets.add(user)
+                retweeted.save()
+                return Response(self.get_serializer_class()(retweeted).data,status=status.HTTP_200_OK)
+            return Response("You don't have permission to retweet this tweet.",status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+    @action(detail=False, methods=["post"],url_path=f"reply",)
+    def reply(self, request):
+        try:
+            username = Auth(request=request)["username"]
+            user = Users.objects.get(username=username)
+
+            tweet_username = request.data["tweet_username"]
+            tweet_user = Users.objects.get(username=tweet_username)
+            tweet_text = request.data["tweet_text"]
+            replied_tweet = Tweets.objects.get(username=tweet_user, tweet=tweet_text)
+
+            reply_text = request.data["reply_text"]
+            reply_tweet = Tweets(username=user, tweet=reply_text)
+
+            if (checkUserAllowness(tweet_user.id,user.id)["allowness"]):
+                replied_tweet.replies.add(reply_tweet)
+                replied_tweet.save()
+                return Response(self.get_serializer_class()(replied_tweet).data,status=status.HTTP_200_OK)
+            return Response("You don't have permission to reply this tweet.",status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+
+
 def checkUserAllowness(targetuserid,userid):
     locked= Users.objects.get(id=targetuserid).locked
-    print("lsajklajkdsjdflksjdlfkjdlfkjlfj",locked)
     if locked:
         userid_list = Users.objects.get(id=targetuserid).following.values_list("id", flat=True)
         if userid in userid_list:
             return {"locked":True, "allowness":True}
         return {"locked":True, "allowness":False}
-    return {"locked":False, "allowness":True}         
-
-
-
-    
-
-# class RetweetView(APIView):
-#     def post(self, request):
-#         # try:
-#         username = Auth(request=request)["username"]
-#         user = Users.objects.get(username=username)
-#         tweet_username = request.data["tweet_user"]
-#         tweet_text = request.data["tweet_text"]
-#         tweet_user = Users.objects.get(username=tweet_username)
-#         retweeted = Tweets(username=tweet_user, tweet=tweet_text)
-#         retweeted.save()
-
-#         retweeted.retweets.add(user)
-#         retweeted.save()
-#         serializer = TweetsSerializer(retweeted)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# # except Exception as e:
-# #     return Response(e, status=status.HTTP_400_BAD_REQUEST)
-
-
-# class ReplyView(APIView):
-#     def post(self, request):
-#         try:
-#             username = Auth(request=request)["username"]
-#             user = Users.objects.get(username=username)
-
-#             tweet_username = request.data["tweet_username"]
-#             tweet_user = Users.objects.get(username=tweet_username)
-#             tweet_text = request.data["tweet_text"]
-#             replied_tweet = Tweets.objects.get(username=tweet_user, tweet=tweet_text)
-
-#             reply_text = request.data["reply_text"]
-#             reply_tweet = Tweets(username=user, tweet=reply_text)
-
-#             replied_tweet.replies.add(reply_tweet)
-#             replied_tweet.save()
-
-#             serializer = TweetsSerializer(replied_tweet)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-
-#         except Exception as e:
-#             return Response(e, status=status.HTTP_400_BAD_REQUEST)
+    return {"locked":False, "allowness":True}     
