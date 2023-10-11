@@ -1,1 +1,1 @@
-# twitter_rest_api
+# twitter_rest_api_django
